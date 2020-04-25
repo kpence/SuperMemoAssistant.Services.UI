@@ -158,13 +158,13 @@ namespace SuperMemoAssistant.Services.UI.Configuration
             if (config.IsChanged)
             {
               config.IsChanged = false;
-              Svc.Configuration.Save(m, m.GetType()).RunAsync();
+              Svc.Configuration.SaveAsync(m, m.GetType()).RunAsync();
             }
 
             break;
 
           case INotifyPropertyChanged _:
-            Svc.Configuration.Save(m, m.GetType()).RunAsync();
+            Svc.Configuration.SaveAsync(m, m.GetType()).RunAsync();
             break;
         }
 
