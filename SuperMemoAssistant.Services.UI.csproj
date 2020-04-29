@@ -74,7 +74,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="SuperMemoAssistant.Interop">
-      <Version>2.0.5-alpha-0</Version>
+      <Version>2.0.5-alpha.6</Version>
     </PackageReference>
   </ItemGroup>
   <Target Name="NuPack" AfterTargets="Build" Condition=" $(RunNuPack) == 'True' ">
