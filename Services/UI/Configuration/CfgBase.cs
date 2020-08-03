@@ -33,6 +33,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using Anotar.Serilog;
 using AutoMapper;
 using Forge.Forms;
@@ -170,6 +171,10 @@ namespace SuperMemoAssistant.Services.UI.Configuration
 
     private void ApplyChanges(TCfg original)
     {
+      // TODO: Find why ApplyChanges gets called with original set to this reference and remove this bit below
+      if (object.ReferenceEquals(this, original))
+        return;
+
       if (original == null)
       {
         LogTo.Error($"original cannot be NULL for type {typeof(TCfg).FullName}");
