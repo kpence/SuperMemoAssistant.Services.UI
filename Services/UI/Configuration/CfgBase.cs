@@ -88,13 +88,16 @@ namespace SuperMemoAssistant.Services.UI.Configuration
     ///   Whether using the <see cref="Cancel" /> Action resets this
     ///   instance to its original version
     /// </param>
-    protected CfgBase(bool undoChangesOnCancel = true)
+    protected CfgBase(bool undoChangesOnCancel)
     {
       UndoChangesOnCancel = undoChangesOnCancel;
 
       if (_isInit == false)
         InitializeCfgBase();
     }
+    
+    /// <summary>Constructor</summary>
+    protected CfgBase() : this(true) {}
 
     #endregion
 

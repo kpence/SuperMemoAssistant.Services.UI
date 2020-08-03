@@ -42,12 +42,13 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Forge.Forms;
 using PropertyChanged;
+using SuperMemoAssistant.Services.UI.Configuration;
 using SuperMemoAssistant.Sys.Windows.Input;
 
 namespace SuperMemoAssistant.Services.UI.Forms.Types
 {
   public class CrudList<T> : CrudList, IList<T>, ICollection<T>, IEnumerable<T>, IReadOnlyList<T>, IReadOnlyCollection<T>
-    where T : new()
+    where T : class, new()
   {
     #region Constructors
 
@@ -59,6 +60,11 @@ namespace SuperMemoAssistant.Services.UI.Forms.Types
       CollectionView = CollectionViewSource.GetDefaultView(this);
     }
 
+    public CrudList()
+      : this(string.Empty, new ObservableCollection<T>())
+    {
+    }
+
     #endregion
 
 
@@ -66,7 +72,7 @@ namespace SuperMemoAssistant.Services.UI.Forms.Types
 
     #region Properties & Fields - Public
 
-    public ObservableCollection<T> BackingCollection { get; set; }
+    public ObservableCollection<T> BackingCollection { get; }
 
     public Func<CrudList<T>, Task>    NewFunc    { get; set; }
     public Func<CrudList<T>, T, Task> EditFunc   { get; set; }
@@ -168,14 +174,20 @@ namespace SuperMemoAssistant.Services.UI.Forms.Types
     {
       if (NewFunc != null)
       {
-        await NewFunc(this);
+        await NewFunc(this).ConfigureAwait(false);
         return;
       }
 
-      var item = new T();
-      var res  = await Show.Window().For<T>(item);
+      DialogResult<T> result;
+      var             item = new T();
 
-      if (res.Action is "cancel")
+      if (item is CfgBase<T>)
+        result = await (item as CfgBase<T>).ShowWindow().ConfigureAwait(false);
+
+      else
+        result = await Show.Window().For(item).ConfigureAwait(false);
+
+      if (result.Action is "cancel")
         return;
 
       Application.Current.Dispatcher.Invoke(() => Add(item));
@@ -197,7 +209,9 @@ namespace SuperMemoAssistant.Services.UI.Forms.Types
       if (EditFunc != null)
         return EditFunc(this, item);
 
-      return Show.Window().For<T>(item);
+      return (item is CfgBase<T>)
+        ? (item as CfgBase<T>).ShowWindow()
+        : Show.Window().For<T>(item);
     }
 
     public static implicit operator ObservableCollection<T>(CrudList<T> self)
