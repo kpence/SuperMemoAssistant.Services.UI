@@ -173,10 +173,12 @@ namespace SuperMemoAssistant.Services.UI.Configuration
 
       async Task ShowDialog()
       {
-        var dialogRes = await Forge.Forms.Show.Window().For(new Prompt<bool>
+        var dialogRes = await Forge.Forms.Show.Window().For(new Confirmation()
         {
-          Title   = "Warning",
-          Message = "There are unsaved changes. If you confirm, you will lose them."
+          Title          = "Warning",
+          Message        = "There are unsaved changes. If you confirm, you will lose them.",
+          PositiveAction = "Discard changes",
+          NegativeAction = "Cancel"
         }).ConfigureAwait(false);
 
         if (dialogRes.Model.Confirmed)
