@@ -131,7 +131,7 @@ namespace SuperMemoAssistant.Services.UI.Configuration
         CanResize = true,
       };
 
-      return Show.Window(this, options).For<TCfg>(MapClone()));
+      return Show.Window(this, options).For<TCfg>(MapClone());
     }
 
     /// <summary>
