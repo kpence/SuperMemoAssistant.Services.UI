@@ -182,7 +182,7 @@ namespace SuperMemoAssistant.Services.UI.Forms.Types
       var             item = new T();
 
       if (item is CfgBase<T>)
-        result = await (item as CfgBase<T>).ShowWindow().ConfigureAwait(false);
+        result = await (item as CfgBase<T>).ShowWindowAsync().ConfigureAwait(false);
 
       else
         result = await Show.Window().For(item).ConfigureAwait(false);
@@ -210,7 +210,7 @@ namespace SuperMemoAssistant.Services.UI.Forms.Types
         return EditFunc(this, item);
 
       return (item is CfgBase<T>)
-        ? (item as CfgBase<T>).ShowWindow()
+        ? (item as CfgBase<T>).ShowWindowAsync()
         : Show.Window().For<T>(item);
     }
 

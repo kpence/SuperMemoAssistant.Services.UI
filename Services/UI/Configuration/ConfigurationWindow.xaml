@@ -10,8 +10,8 @@
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=System"
         mc:Ignorable="d"
-        Title="ConfigurationWindow" Height="550" Width="800"
-        KeyDown="Window_KeyDown"
+        Title="Configuration Window"
+        Height="550" Width="800"
         Closed="Window_Closed"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         d:DataContext="{d:DesignInstance configuration:ConfigurationWindow}">
@@ -40,6 +40,11 @@
       <configuration:ConfigurationTemplateSelector x:Key="ConfigurationTemplateSelector" />
     </ResourceDictionary>
   </Window.Resources>
+
+  <Window.InputBindings>
+    <KeyBinding Key="Return" Command="{Binding SaveCommand}" />
+    <KeyBinding Key="Escape" Command="{Binding CancelCommand}" />
+  </Window.InputBindings>
 
   <Grid>
     <Grid.RowDefinitions>
@@ -72,16 +77,17 @@
         <ColumnDefinition Width="auto" />
       </Grid.ColumnDefinitions>
 
-      <!--<Button Grid.Column="1"
+      <Button Grid.Column="1"
               VerticalAlignment="Center"
               Margin="6 0 6 0"
               Content="Cancel"
-              Click="BtnCancel_Click" />-->
+              Command="{Binding CancelCommand}" />
 
       <Button Grid.Column="2"
               VerticalAlignment="Center"
+              Margin="6 0 6 0"
               Content="Ok"
-              Click="BtnOk_Click" />
+              Command="{Binding SaveCommand}" />
 
     </Grid>
   </Grid>

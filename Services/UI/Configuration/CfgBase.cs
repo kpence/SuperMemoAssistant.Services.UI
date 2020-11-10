@@ -19,33 +19,29 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-// 
-// 
-// Modified On:  2020/03/12 15:37
-// Modified By:  Alexis
 
 #endregion
 
 
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using Anotar.Serilog;
-using AutoMapper;
-using Forge.Forms;
-using Forge.Forms.Annotations;
+
 
 // ReSharper disable StaticMemberInGenericType
 
 namespace SuperMemoAssistant.Services.UI.Configuration
 {
+  using System;
+  using System.Collections.Generic;
+  using System.Linq;
+  using System.Threading.Tasks;
+  using Anotar.Serilog;
+  using AutoMapper;
+  using Forge.Forms;
+  using Forge.Forms.Annotations;
+
   /// <summary>
-  ///   Facilitates creating configurations by implementing common behaviour such as
-  ///   resetting changes on cancel
+  ///   Facilitates creating configurations by implementing common behaviour such as resetting changes on cancel
   /// </summary>
   /// <typeparam name="TCfg">The child configuration's type</typeparam>
   public abstract class CfgBase<TCfg> : IActionHandler
@@ -71,10 +67,7 @@ namespace SuperMemoAssistant.Services.UI.Configuration
 
     protected bool UndoChangesOnCancel { get; }
 
-    /// <summary>
-    ///   Override this Property if the configuration model has nested types that need to
-    ///   mapped.
-    /// </summary>
+    /// <summary>Override this Property if the configuration model has nested types that need to mapped.</summary>
     protected virtual IEnumerable<Type> InnerTypesToMap { get; } = Array.Empty<Type>();
 
     #endregion
@@ -86,8 +79,8 @@ namespace SuperMemoAssistant.Services.UI.Configuration
 
     /// <summary>Constructor</summary>
     /// <param name="undoChangesOnCancel">
-    ///   Whether using the <see cref="Cancel" /> Action resets this
-    ///   instance to its original version
+    ///   Whether using the <see cref="Cancel" /> Action resets this instance to its original
+    ///   version
     /// </param>
     protected CfgBase(bool undoChangesOnCancel)
     {
@@ -96,9 +89,9 @@ namespace SuperMemoAssistant.Services.UI.Configuration
       if (_isInit == false)
         InitializeCfgBase();
     }
-    
+
     /// <summary>Constructor</summary>
-    protected CfgBase() : this(true) {}
+    protected CfgBase() : this(true) { }
 
     #endregion
 
@@ -131,14 +124,38 @@ namespace SuperMemoAssistant.Services.UI.Configuration
     /// <summary>Show an option window for this instance of <see cref="TCfg" /></summary>
     /// <param name="options">Optional window display options</param>
     /// <returns>Dialog result</returns>
-    public Task<DialogResult<TCfg>> ShowWindow(WindowOptions options = null)
+    public Task<DialogResult<TCfg>> ShowWindowAsync(WindowOptions options = null)
     {
       options ??= new WindowOptions
       {
         CanResize = true,
       };
 
-      return Show.Window(this, options).For<TCfg>(_mapper.Map<TCfg>(this));
+      return Show.Window(this, options).For<TCfg>(MapClone()));
+    }
+
+    /// <summary>
+    /// Creates a clone of this object using <see cref="AutoMapper.Mapper.Map{TCfg}(object)"/>.
+    /// </summary>
+    /// <returns></returns>
+    internal TCfg MapClone()
+    {
+      return _mapper.Map<TCfg>(this);
+    }
+
+    internal void ApplyChanges(TCfg original)
+    {
+      // TODO: Find why ApplyChanges gets called with original set to this reference and remove this bit below
+      if (ReferenceEquals(this, original))
+        return;
+
+      if (original == null)
+      {
+        LogTo.Error("original cannot be NULL for type {FullName}", typeof(TCfg).FullName);
+        throw new ArgumentNullException(nameof(original));
+      }
+
+      _mapper.Map(this, original);
     }
 
     private void InitializeCfgBase()
@@ -167,21 +184,6 @@ namespace SuperMemoAssistant.Services.UI.Configuration
 
       // Set init flag
       _isInit = true;
-    }
-
-    private void ApplyChanges(TCfg original)
-    {
-      // TODO: Find why ApplyChanges gets called with original set to this reference and remove this bit below
-      if (object.ReferenceEquals(this, original))
-        return;
-
-      if (original == null)
-      {
-        LogTo.Error($"original cannot be NULL for type {typeof(TCfg).FullName}");
-        throw new ArgumentNullException(nameof(original));
-      }
-
-      _mapper.Map(this, original);
     }
 
     #endregion

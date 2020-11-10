@@ -2,6 +2,7 @@
 <Project Sdk="SuperMemoAssistant.Sdk.WindowsDesktop">
   <PropertyGroup>
     <OutputType>Library</OutputType>
+    <RootNamespace>SuperMemoAssistant</RootNamespace>
     <Deterministic>true</Deterministic>
     <UseWPF>true</UseWPF>
     <AssemblyVersion>2.1.0</AssemblyVersion>
@@ -74,7 +75,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="SuperMemoAssistant.Interop">
-      <Version>2.1.0-beta.6</Version>
+      <Version>2.1.0-beta.7</Version>
     </PackageReference>
   </ItemGroup>
   <Target Name="NuPack" AfterTargets="Build" Condition=" $(RunNuPack) == 'True' ">
