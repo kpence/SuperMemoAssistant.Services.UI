@@ -73,10 +73,6 @@ namespace SuperMemoAssistant.Services.UI.Configuration
 
     protected ConfigurationWindow(string title, HotKeyManager hotKeyManager, params INotifyPropertyChanged[] configModels)
     {
-      InitializeComponent();
-
-      //Array.ForEach(configModels, m => Models.Add(m));
-
       foreach (var original in configModels)
       {
         object model = original;
@@ -100,6 +96,8 @@ namespace SuperMemoAssistant.Services.UI.Configuration
 
       CancelCommand = new AsyncRelayCommand(CancelChangesAsync, null, HandleExceptionAsync);
       SaveCommand   = new RelayCommand(SaveChanges);
+      
+      InitializeComponent();
     }
 
     #endregion
