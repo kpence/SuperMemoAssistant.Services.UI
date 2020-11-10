@@ -166,7 +166,10 @@ namespace SuperMemoAssistant.Services.UI.Configuration
     private async Task CancelChangesAsync()
     {
       if (HasChanges() == false)
+      {
+        Dispatcher.Invoke(Close);
         return;
+      }
 
       async Task ShowDialog()
       {
