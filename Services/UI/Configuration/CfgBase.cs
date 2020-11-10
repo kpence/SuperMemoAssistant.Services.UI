@@ -39,6 +39,7 @@ namespace SuperMemoAssistant.Services.UI.Configuration
   using AutoMapper;
   using Forge.Forms;
   using Forge.Forms.Annotations;
+  using Sys.ComponentModel;
 
   /// <summary>
   ///   Facilitates creating configurations by implementing common behaviour such as resetting changes on cancel
@@ -140,7 +141,12 @@ namespace SuperMemoAssistant.Services.UI.Configuration
     /// <returns></returns>
     internal TCfg MapClone()
     {
-      return _mapper.Map<TCfg>(this);
+      var clone = _mapper.Map<TCfg>(this);
+
+      if (clone is INotifyPropertyChangedEx npc)
+        npc.IsChanged = false;
+
+      return clone;
     }
 
     internal void ApplyChanges(TCfg original)
