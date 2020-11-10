@@ -31,7 +31,6 @@ namespace SuperMemoAssistant.Services.UI.Configuration
   using System.Collections.Generic;
   using System.Collections.ObjectModel;
   using System.ComponentModel;
-  using System.Diagnostics.CodeAnalysis;
   using System.Linq;
   using System.Reflection;
   using System.Threading;
@@ -50,9 +49,6 @@ namespace SuperMemoAssistant.Services.UI.Configuration
   {
     #region Constants & Statics
 
-    private static readonly MethodInfo _mapCloneMethod;
-    private static readonly MethodInfo _applyChanges;
-
     /// <summary>Ensures only one <see cref="ConfigurationWindow" /> is open at all time</summary>
     private static Semaphore SingletonSemaphore { get; } = new Semaphore(1, 1);
 
@@ -65,21 +61,15 @@ namespace SuperMemoAssistant.Services.UI.Configuration
 
     private Dictionary<object, object> ModelOriginalMap { get; } = new Dictionary<object, object>();
 
+    private Dictionary<Type, Dictionary<string, MethodInfo>> TypeMethodsMap { get; } =
+      new Dictionary<Type, Dictionary<string, MethodInfo>>();
+
     #endregion
 
 
 
 
     #region Constructors
-
-    [SuppressMessage("Performance", "CA1810:Initialize reference type static fields inline", Justification = "<Pending>")]
-    static ConfigurationWindow()
-    {
-      var cfgBaseType = typeof(CfgBase<>);
-
-      _mapCloneMethod = cfgBaseType.GetMethod(nameof(CfgBase<object>.MapClone), BindingFlags.NonPublic     | BindingFlags.Instance);
-      _applyChanges   = cfgBaseType.GetMethod(nameof(CfgBase<object>.ApplyChanges), BindingFlags.NonPublic | BindingFlags.Instance);
-    }
 
     protected ConfigurationWindow(string title, HotKeyManager hotKeyManager, params INotifyPropertyChanged[] configModels)
     {
@@ -92,7 +82,7 @@ namespace SuperMemoAssistant.Services.UI.Configuration
         object model = original;
 
         if (original.GetType().IsSubclassOfUnboundGeneric(typeof(CfgBase<>)))
-          model = _mapCloneMethod.Invoke(original, null);
+          model = MapClone(original);
 
         ModelOriginalMap[model] = original;
         Models.Add(model);
@@ -145,11 +135,11 @@ namespace SuperMemoAssistant.Services.UI.Configuration
     {
       foreach (var kv in ModelOriginalMap)
       {
-        var model = kv.Key;
+        var model    = kv.Key;
         var original = kv.Value;
 
         if (ReferenceEquals(model, original) == false)
-          _applyChanges.Invoke(model, new[] { original });
+          ApplyChanges(original, model);
 
         switch (original)
         {
@@ -260,6 +250,34 @@ namespace SuperMemoAssistant.Services.UI.Configuration
 
         return cfgWdw;
       });
+    }
+
+    private MethodInfo GetMethodInfo(Type type, string name)
+    {
+      var typeMethods = TypeMethodsMap.SafeGet(type, new Dictionary<string, MethodInfo>());
+      var method      = typeMethods.SafeGet(name);
+
+      if (method == null)
+      {
+        method = type.GetMethod(name, BindingFlags.NonPublic | BindingFlags.Instance);
+
+        if (method == null)
+          throw new InvalidOperationException($"Method {name} of type {type.FullName} couldn't be found");
+
+        typeMethods[name] = method;
+      }
+
+      return method;
+    }
+
+    private object MapClone(object original)
+    {
+      return GetMethodInfo(original.GetType(), nameof(CfgBase<object>.MapClone)).Invoke(original, null);
+    }
+
+    private object ApplyChanges(object original, object model)
+    {
+      return GetMethodInfo(model.GetType(), nameof(CfgBase<object>.ApplyChanges)).Invoke(model, new[] { original });
     }
 
     #endregion
