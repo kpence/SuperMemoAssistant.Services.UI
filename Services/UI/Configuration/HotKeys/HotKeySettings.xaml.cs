@@ -47,7 +47,7 @@ namespace SuperMemoAssistant.Services.UI.Configuration.HotKeys
 
     public static readonly DependencyProperty HotKeyManagerProperty =
       DependencyProperty.Register(
-        "HotKeyManager",
+        nameof(HotKeyManager),
         typeof(HotKeyManager),
         typeof(HotKeySettings),
         new FrameworkPropertyMetadata
