@@ -202,12 +202,12 @@ namespace SuperMemoAssistant.Services.UI.Configuration
     /// <param name="ex"></param>
     private async Task HandleExceptionAsync(Exception ex)
     {
-      LogTo.Error(ex, "Exception occured during a user requested operation in a Configuration window");
+      LogTo.Error(ex, "Exception occurred during a user requested operation in a Configuration window");
 
       await Dispatcher.Invoke(
         async () =>
         {
-          var errMsg = $"An error occured: {ex.Message}";
+          var errMsg = $"An error occurred: {ex.Message}";
 
           await errMsg.ErrorMsgBox().ConfigureAwait(false);
         }
