@@ -74,7 +74,7 @@
       <Version>3.3.3</Version>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SuperMemoAssistant.Interop" Version="2.1.0.25" />
+    <PackageReference Include="SuperMemoAssistant.Interop" Version="2.1.0.26" />
   </ItemGroup>
   <Target Name="NuPack" AfterTargets="Build" Condition=" $(RunNuPack) == 'True' ">
     <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
